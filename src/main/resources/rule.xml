@@ -140,7 +140,10 @@
 	<function name="aiyong-sharding-range" class="io.mycat.route.function.PartitionByAiyong">
 		<!-- how many data nodes -->
 		<property name="count">3</property>
+		<!-- 按范围取分片的文件-->
 		<property name="mapFile">aiyong-range-file.txt</property>
+		<!-- 分表的个数-->
 		<property name="tablecount">10</property>
+
 	</function>
 </mycat:rule>

@@ -106,7 +106,7 @@ public abstract class AbstractPartitionAlgorithm implements RuleAlgorithm ,Seria
 	 */
 
 
-	
+
 	public Integer calculateTables(String columnValue) {
 		return null; // 表示没有限制
 	}

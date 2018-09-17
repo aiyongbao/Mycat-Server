@@ -36,6 +36,7 @@ public class PartitionByAiyong extends AbstractPartitionAlgorithm implements Rul
 
 	private int count;
 	private int tablecount;
+	private boolean aiyongDefined;
 
 	@Override
 	public void init() {
@@ -102,6 +103,9 @@ public class PartitionByAiyong extends AbstractPartitionAlgorithm implements Rul
 	}
 	public void setTablecount(int tablecount) {
 		this.tablecount = tablecount;
+	}
+	public void setAiyongDefined(boolean aiyongDefined) {
+		this.aiyongDefined = aiyongDefined;
 	}
 
 	@Override
