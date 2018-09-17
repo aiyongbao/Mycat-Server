@@ -91,14 +91,37 @@ public class TableConfig {
         }
 
         if (subTables != null && !subTables.equals("")) {
-            String sTables[] = SplitUtil.split(subTables, ',', '$', '-');
-            if (sTables == null || sTables.length <= 0) {
-                throw new IllegalArgumentException("invalid table subTables");
+
+            String str=subTables.substring(subTables.indexOf("$")+1, subTables.length());
+            String startChar="(";
+            String splitChar="-";
+            String endChar=")";
+            boolean valid=str.contains(startChar)&&str.contains(splitChar)&&str.contains(endChar);
+
+            //默认的分表规则
+            if(!valid){
+                String sTables[] = SplitUtil.split(subTables, ',', '$', '-');
+                if (sTables == null || sTables.length <= 0) {
+                    throw new IllegalArgumentException("invalid table subTables");
+                }
+                this.distTables = new ArrayList<String>(sTables.length);
+                for (String table : sTables) {
+                    distTables.add(table);
+                }
+            }else{
+                //自定义分表的规则
+                int subtableSplite = str.indexOf("-");
+                String subMin = str.substring(1,subtableSplite);
+                String subMax = str.substring(subtableSplite+1,str.length()-1);
+                String tablePrex=subTables.substring(0, subTables.indexOf("$"));
+                this.distTables = new ArrayList<String>();
+                for (int i = Integer.parseInt(subMin); i < Integer.parseInt(subMax)+1;i++) {
+                    String table=tablePrex+i;
+                    distTables.add(table);
+                }
+
             }
-            this.distTables = new ArrayList<String>(sTables.length);
-            for (String table : sTables) {
-                distTables.add(table);
-            }
+
         } else {
             this.distTables = new ArrayList<String>();
         }

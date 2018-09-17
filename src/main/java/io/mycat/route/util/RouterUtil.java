@@ -1194,23 +1194,68 @@ public class RouterUtil {
 		}
 		String partionCol = tableConfig.getPartitionColumn();
 //		String primaryKey = tableConfig.getPrimaryKey();
-        boolean isLoadData=false;
+		boolean isLoadData=false;
 
-        Set<String> tablesRouteSet = new HashSet<String>();
+		Set<String> tablesRouteSet = new HashSet<String>();
 
-        List<String> dataNodes = tableConfig.getDataNodes();
-        if(dataNodes.size()>1){
-			String msg = "can't suport district table  " + tableName + " schema:" + schema.getName() + " for mutiple dataNode " + dataNodes;
+		List<String> dataNodes = tableConfig.getDataNodes();
+		String dataNode = dataNodes.get(0);
+		if(dataNodes.size()>1){
+			if(tablesAndConditions.isEmpty()){
+				String msg = "查询命令请添加与列："+partionCol+"相关的查询条件 ";
+				LOGGER.warn(msg);
+				throw new SQLNonTransientException(msg);
+			}
+			/*String msg = "can't suport district table  " + tableName + " schema:" + schema.getName() + " for mutiple dataNode " + dataNodes;
         	LOGGER.warn(msg);
-			throw new SQLNonTransientException(msg);
-        }
-        String dataNode = dataNodes.get(0);
+			throw new SQLNonTransientException(msg);*/
+
+
+
+			int nodeSelect = 0;
+			for(Map.Entry<String, Map<String, Set<ColumnRoutePair>>> entry : tablesAndConditions.entrySet()) {
+				boolean isFoundPartitionValue = partionCol != null && entry.getValue().get(partionCol) != null;
+				Map<String, Set<ColumnRoutePair>> columnsMap = entry.getValue();
+
+				Set<ColumnRoutePair> partitionValue = columnsMap.get(partionCol);
+
+				if(partitionValue == null || partitionValue.size() == 0) {
+					String msg = "查询命令请添加与列:"+partionCol+"相关的查询条件 ";
+					LOGGER.warn(msg);
+					throw new SQLNonTransientException(msg);
+				} else {
+					for(ColumnRoutePair pair : partitionValue) {
+						AbstractPartitionAlgorithm algorithm = tableConfig.getRule().getRuleAlgorithm();
+						if(pair.colValue != null) {
+
+							Integer nodeIndex = algorithm.calculate(pair.colValue);
+							if(nodeIndex == null) {
+								String msg = "can't find any valid datanode :" + tableConfig.getName()
+										+ " -> " + tableConfig.getPartitionColumn() + " -> " + pair.colValue;
+								LOGGER.warn(msg);
+								throw new SQLNonTransientException(msg);
+							}
+							nodeSelect = nodeIndex;
+
+
+						}
+
+					}
+				}
+			}
+
+			//获取确定的datanode
+
+			dataNode = dataNodes.get(nodeSelect);
+		}
+
 
 		//主键查找缓存暂时不实现
-        if(tablesAndConditions.isEmpty()){
-        	List<String> subTables = tableConfig.getDistTables();
-        	tablesRouteSet.addAll(subTables);
-        }
+		if(tablesAndConditions.isEmpty()){
+			List<String> subTables = tableConfig.getDistTables();
+
+			tablesRouteSet.addAll(subTables);
+		}
 
 		for(Map.Entry<String, Map<String, Set<ColumnRoutePair>>> entry : tablesAndConditions.entrySet()) {
 			boolean isFoundPartitionValue = partionCol != null && entry.getValue().get(partionCol) != null;
@@ -1223,7 +1268,7 @@ public class RouterUtil {
 				for(ColumnRoutePair pair : partitionValue) {
 					AbstractPartitionAlgorithm algorithm = tableConfig.getRule().getRuleAlgorithm();
 					if(pair.colValue != null) {
-						Integer tableIndex = algorithm.calculate(pair.colValue);
+						Integer tableIndex = algorithm.calculateTables(pair.colValue);
 						if(tableIndex == null) {
 							String msg = "can't find any valid datanode :" + tableConfig.getName()
 									+ " -> " + tableConfig.getPartitionColumn() + " -> " + pair.colValue;
@@ -1257,7 +1302,7 @@ public class RouterUtil {
 
 		Object[] subTables =  tablesRouteSet.toArray();
 		RouteResultsetNode[] nodes = new RouteResultsetNode[subTables.length];
-	   Map<String,Integer> dataNodeSlotMap=	rrs.getDataNodeSlotMap();
+		Map<String,Integer> dataNodeSlotMap=	rrs.getDataNodeSlotMap();
 		for(int i=0;i<nodes.length;i++){
 			String table = String.valueOf(subTables[i]);
 			String changeSql = orgSql;

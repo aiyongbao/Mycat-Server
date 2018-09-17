@@ -79,6 +79,15 @@
 			<algorithm>jump-consistent-hash</algorithm>
 		</rule>
 	</tableRule>
+    <tableRule name="aiyong-sharding-range">
+        <rule>
+            <columns>projectId</columns>
+            <algorithm>aiyong-sharding-range</algorithm>
+        </rule>
+    </tableRule>
+
+
+
 
 	<function name="murmur"
 		class="io.mycat.route.function.PartitionByMurmurHash">
@@ -126,5 +135,12 @@
 	
 	<function name="jump-consistent-hash" class="io.mycat.route.function.PartitionByJumpConsistentHash">
 		<property name="totalBuckets">3</property>
+	</function>
+
+	<function name="aiyong-sharding-range" class="io.mycat.route.function.PartitionByAiyong">
+		<!-- how many data nodes -->
+		<property name="count">3</property>
+		<property name="mapFile">aiyong-range-file.txt</property>
+		<property name="tablecount">10</property>
 	</function>
 </mycat:rule>
