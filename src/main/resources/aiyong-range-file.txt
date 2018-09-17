@@ -1,0 +1,4 @@
+# range start-end ,data node group size
+0-300=1
+301-599=2
+600-999=3

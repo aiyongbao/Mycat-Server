@@ -10,7 +10,7 @@
 <!DOCTYPE mycat:server SYSTEM "server.dtd">
 <mycat:server xmlns:mycat="http://io.mycat/">
 	<system>
-	<property name="nonePasswordLogin">0</property> <!-- 0为需要密码登陆、1为不需要密码登陆 ,默认为0，设置为1则需要指定默认账户-->
+	<property name="nonePasswordLogin">1</property> <!-- 0为需要密码登陆、1为不需要密码登陆 ,默认为0，设置为1则需要指定默认账户-->
 	<property name="useHandshakeV10">1</property>
 	<property name="useSqlStat">0</property>  <!-- 1为开启实时统计、0为关闭 -->
 	<property name="useGlobleTableCheck">0</property>  <!-- 1为开启全加班一致性检测、0为关闭 -->
@@ -93,10 +93,17 @@
        </blacklist>
 	</firewall>
 	-->
+	<firewall>
+		<whitehost>
+			<host host="127.0.0.1" user="root"/>
+		</whitehost>
+		<blacklist check="false">
+		</blacklist>
+	</firewall>
 
 	<user name="root" defaultAccount="true">
-		<property name="password">123456</property>
-		<property name="schemas">TESTDB</property>
+		<property name="password">JbcZjTyl</property>
+		<property name="schemas">aiyong-logistics</property>
 		
 		<!-- 表级 DML 权限设置 -->
 		<!-- 		
@@ -108,11 +115,11 @@
 		</privileges>		
 		 -->
 	</user>
-
+<!--
 	<user name="user">
 		<property name="password">user</property>
 		<property name="schemas">TESTDB</property>
 		<property name="readOnly">true</property>
-	</user>
+	</user>-->
 
 </mycat:server>
