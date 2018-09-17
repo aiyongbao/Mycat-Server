@@ -1201,7 +1201,7 @@ public class RouterUtil {
 		List<String> dataNodes = tableConfig.getDataNodes();
 		String dataNode = dataNodes.get(0);
 		if(dataNodes.size()>1){
-			if(tablesAndConditions.isEmpty()){
+			if(tablesAndConditions.isEmpty()){  //查询命令必须带分库分表的基础列的查询条件
 				String msg = "查询命令请添加与列："+partionCol+"相关的查询条件 ";
 				LOGGER.warn(msg);
 				throw new SQLNonTransientException(msg);
@@ -1211,7 +1211,7 @@ public class RouterUtil {
 			throw new SQLNonTransientException(msg);*/
 
 
-
+			//根据算法先确定node的ID再去分表里执行
 			int nodeSelect = 0;
 			for(Map.Entry<String, Map<String, Set<ColumnRoutePair>>> entry : tablesAndConditions.entrySet()) {
 				boolean isFoundPartitionValue = partionCol != null && entry.getValue().get(partionCol) != null;
@@ -1244,8 +1244,6 @@ public class RouterUtil {
 				}
 			}
 
-			//获取确定的datanode
-
 			dataNode = dataNodes.get(nodeSelect);
 		}
 
@@ -1265,9 +1263,11 @@ public class RouterUtil {
 			if(partitionValue == null || partitionValue.size() == 0) {
 				tablesRouteSet.addAll(tableConfig.getDistTables());
 			} else {
+				//如果有分表操作，使用分表算法
 				for(ColumnRoutePair pair : partitionValue) {
 					AbstractPartitionAlgorithm algorithm = tableConfig.getRule().getRuleAlgorithm();
 					if(pair.colValue != null) {
+
 						Integer tableIndex = algorithm.calculateTables(pair.colValue);
 						if(tableIndex == null) {
 							String msg = "can't find any valid datanode :" + tableConfig.getName()
