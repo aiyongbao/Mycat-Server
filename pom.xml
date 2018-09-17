@@ -231,6 +231,7 @@
 			<artifactId>netty-buffer</artifactId>
 			<version>4.1.9.Final</version>
 		</dependency>
+		<!-- 增加JDBC中Postgresql的jar -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
