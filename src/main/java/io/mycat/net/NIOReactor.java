@@ -93,6 +93,8 @@ public final class NIOReactor {
 					long start = System.nanoTime();
 					tSelector.select(500L);
 					long end = System.nanoTime();
+
+
 					register(tSelector);
 					keys = tSelector.selectedKeys();
 					if (keys.size() == 0 && (end - start) < SelectorUtil.MIN_SELECT_TIME_IN_NANO_SECONDS )

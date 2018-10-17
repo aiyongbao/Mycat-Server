@@ -36,7 +36,7 @@ public class MycatStatementParser extends MySqlStatementParser
     {
 
         MycatSelectParser selectParser = new MycatSelectParser(this.selectExprParser);
-        return new SQLSelectStatement(selectParser.select(), JdbcConstants.MYSQL);
+        return new SQLSelectStatement(selectParser.select(), JdbcConstants.POSTGRESQL);
     }
 
 
